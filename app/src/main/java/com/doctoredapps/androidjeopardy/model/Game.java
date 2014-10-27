@@ -1,7 +1,11 @@
 package com.doctoredapps.androidjeopardy.model;
 
 import android.database.Observable;
+import android.support.annotation.IntDef;
+import android.support.annotation.IntegerRes;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 
 /**
@@ -15,12 +19,26 @@ public class Game implements Round.OnRoundEndedListener{
     private Round currentRound;
     private int currentRoundIndex;
 
-    private PlayerControlManager playerControlManager;
+    private Player playerWithControl;
+
+    private GameStateObservable gameStateObservable;
+
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({GAME_STATE_NEW_ROUND, GAME_STATE_FINAL_JEOPARDY, GAME_STATE_END})
+    public @interface GAME_STATE{}
+
+    public static final int GAME_STATE_NEW_ROUND = 0;
+    public static final int GAME_STATE_FINAL_JEOPARDY = 1;
+    public static final int GAME_STATE_END = 2;
+
 
     Game(Round[] rounds, HashMap<String, Player> players) {
         this.rounds = rounds;
         this.players = players;
         this.currentRound = rounds[currentRoundIndex];
+        this.currentRound.registerObserver(this);
+        this.gameStateObservable = new GameStateObservable();
     }
 
     public void incrementPlayerScore(String playerId) {
@@ -32,31 +50,48 @@ public class Game implements Round.OnRoundEndedListener{
     }
 
     public void givePlayerControl(String playerId) {
-        playerControlManager.notifyPlayerControlChanged(playerId);
+        playerWithControl.setInControl(false);
+
+        Player player = players.get(playerId);
+        playerWithControl = player;
+        player.setInControl(true);
     }
 
-    public void registerOnPlayerControlChangedListner(OnPlayerControlChanged listener) {
-        playerControlManager.registerObserver(listener);
-    }
-
-    public void unRegisterOnPlayerControlChangedListner(OnPlayerControlChanged listener) {
-        playerControlManager.unregisterObserver(listener);
-    }
 
     @Override
     public void onRoundEnded() {
-        moveToNextRound();
+        dispatchGameStateChangedNotification();
     }
 
-    private void moveToNextRound() {
+    private void dispatchGameStateChangedNotification() {
+
+        if (noMoreRounds()) {
+            gameStateObservable.notifyGameStateChanged(GAME_STATE_END);
+            return;
+        }
+
+        if (finalJeopardyIsNextRound()) {
+            gameStateObservable.notifyGameStateChanged(GAME_STATE_FINAL_JEOPARDY);
+        } else {
+            gameStateObservable.notifyGameStateChanged(GAME_STATE_NEW_ROUND);
+        }
+
+        currentRound = rounds[++currentRoundIndex];
 
     }
 
+    private boolean finalJeopardyIsNextRound() {
+        return currentRoundIndex < rounds.length - 1;
+    }
 
-    private class PlayerControlManager extends Observable<OnPlayerControlChanged>{
-        private void notifyPlayerControlChanged(String playerId) {
-            for (OnPlayerControlChanged listener : mObservers) {
-                listener.onPlayerControlChanged(playerId);
+    private boolean noMoreRounds() {
+        return currentRoundIndex == rounds.length;
+    }
+
+    private static class GameStateObservable extends Observable<OnGameStateChangedListner>{
+        public void notifyGameStateChanged(@GAME_STATE int newGameState) {
+            for (OnGameStateChangedListner listner : mObservers) {
+                listner.onGameStateChanged(newGameState);
             }
         }
     }
@@ -64,7 +99,9 @@ public class Game implements Round.OnRoundEndedListener{
     /**
      * Created by MattDupree on 10/26/14.
      */
-    public static interface OnPlayerControlChanged {
-        public void onPlayerControlChanged(String playerId);
+    public static interface OnGameStateChangedListner {
+
+
+        public void onGameStateChanged(@GAME_STATE int newGameState);
     }
 }

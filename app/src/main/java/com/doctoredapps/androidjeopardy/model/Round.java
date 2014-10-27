@@ -43,7 +43,7 @@ public class Round extends Observable<Round.OnRoundEndedListener> {
     /**
      * Created by MattDupree on 10/26/14.
      */
-    public static interface OnRoundEndedListener {
-        public void onRoundEnded();
+    static interface OnRoundEndedListener {
+        void onRoundEnded();
     }
 }
