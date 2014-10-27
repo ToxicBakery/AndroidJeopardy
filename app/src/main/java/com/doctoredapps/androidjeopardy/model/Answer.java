@@ -14,4 +14,8 @@ public class Answer {
         this.category = category;
         this.scoreValue = scoreValue;
     }
+
+    public int getScoreValue() {
+        return scoreValue;
+    }
 }

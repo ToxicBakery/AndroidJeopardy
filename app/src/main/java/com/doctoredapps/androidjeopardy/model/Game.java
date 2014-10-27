@@ -13,39 +13,26 @@ public class Game implements Round.OnRoundEndedListener{
     private final HashMap<String, Player> players;
 
     private Round currentRound;
-    private Answer currentAnswer;
+    private int currentRoundIndex;
 
-    private ScoreKeeper scoreManager;
-    private PlayerControlKeeper playerControlManager;
+    private PlayerControlManager playerControlManager;
 
-    public Game(Round[] rounds, HashMap<String, Player> players) {
+    Game(Round[] rounds, HashMap<String, Player> players) {
         this.rounds = rounds;
         this.players = players;
-        this.currentRound = rounds[0];
+        this.currentRound = rounds[currentRoundIndex];
     }
 
     public void incrementPlayerScore(String playerId) {
-        scoreManager.notifyPlayerScoreChanged(playerId);
+        players.get(playerId).increaseScoreBy(currentRound.getCurrentAnswer().getScoreValue());
     }
 
     public void decrementPlayerScore(String playerId) {
-        scoreManager.notifyPlayerScoreChanged(playerId);
+        players.get(playerId).decreaseScoreBy(currentRound.getCurrentAnswer().getScoreValue());
     }
 
     public void givePlayerControl(String playerId) {
         playerControlManager.notifyPlayerControlChanged(playerId);
-    }
-
-
-
-
-
-    public void registerOnScoreChangedListner(OnPlayerScoreChangedListener listener) {
-        scoreManager.registerObserver(listener);
-    }
-
-    public void unRegisterOnScoreChangedListner(OnPlayerScoreChangedListener listener) {
-        scoreManager.unregisterObserver(listener);
     }
 
     public void registerOnPlayerControlChangedListner(OnPlayerControlChanged listener) {
@@ -66,28 +53,12 @@ public class Game implements Round.OnRoundEndedListener{
     }
 
 
-    private class ScoreKeeper extends Observable<OnPlayerScoreChangedListener>{
-        private void notifyPlayerScoreChanged(String playerId) {
-            for (OnPlayerScoreChangedListener listener : mObservers) {
-                listener.onPlayerScoreChanged(playerId);
-            }
-        }
-    }
-
-    private class PlayerControlKeeper extends Observable<OnPlayerControlChanged>{
+    private class PlayerControlManager extends Observable<OnPlayerControlChanged>{
         private void notifyPlayerControlChanged(String playerId) {
             for (OnPlayerControlChanged listener : mObservers) {
                 listener.onPlayerControlChanged(playerId);
             }
         }
-    }
-
-
-    /**
-     * Created by MattDupree on 10/26/14.
-     */
-    public static interface OnPlayerScoreChangedListener {
-        public void onPlayerScoreChanged(String playerId);
     }
 
     /**

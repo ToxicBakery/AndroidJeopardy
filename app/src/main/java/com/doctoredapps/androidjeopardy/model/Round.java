@@ -13,6 +13,7 @@ public class Round extends Observable<Round.OnRoundEndedListener> {
 
     private final ArrayList<Category> categories;
     private final HashMap<Category, Answer[]> answers;
+    private Answer currentAnswer;
 
     private Round(ArrayList<Category> categories, HashMap<Category, Answer[]> answers) {
         this.categories = categories;
@@ -31,10 +32,18 @@ public class Round extends Observable<Round.OnRoundEndedListener> {
         return null;
     }
 
+    public void setCurrentAnswer(Answer currentAnswer) {
+        this.currentAnswer = currentAnswer;
+    }
+
+    public Answer getCurrentAnswer() {
+        return currentAnswer;
+    }
+
     /**
      * Created by MattDupree on 10/26/14.
      */
-    static interface OnRoundEndedListener {
-        void onRoundEnded();
+    public static interface OnRoundEndedListener {
+        public void onRoundEnded();
     }
 }
