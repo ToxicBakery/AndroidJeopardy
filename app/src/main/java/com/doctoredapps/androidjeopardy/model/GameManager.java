@@ -10,16 +10,15 @@ public class GameManager {
 
     private Game currentGame;
 
+    private GameManager() {
+    }
+
     public static GameManager getInstance() {
         if (ourInstance == null)
             ourInstance = new GameManager();
 
         return ourInstance;
     }
-
-    private GameManager() {
-    }
-
 
     public void startGame() {
         currentGame = new Game(null, null);
@@ -32,9 +31,6 @@ public class GameManager {
     public Game getCurrentGame() {
         return currentGame;
     }
-
-
-
 
 
 }

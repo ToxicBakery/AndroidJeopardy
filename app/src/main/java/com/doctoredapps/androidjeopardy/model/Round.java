@@ -32,18 +32,18 @@ public class Round extends Observable<Round.OnRoundEndedListener> {
         return null;
     }
 
-    public void setCurrentAnswer(Answer currentAnswer) {
-        this.currentAnswer = currentAnswer;
-    }
-
     public Answer getCurrentAnswer() {
         return currentAnswer;
+    }
+
+    public void setCurrentAnswer(Answer currentAnswer) {
+        this.currentAnswer = currentAnswer;
     }
 
     /**
      * Created by MattDupree on 10/26/14.
      */
-    static interface OnRoundEndedListener {
+    interface OnRoundEndedListener {
         void onRoundEnded();
     }
 }

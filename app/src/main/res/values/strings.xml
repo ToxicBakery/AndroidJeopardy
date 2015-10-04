@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">AndroidJeopardy</string>
+    <string name="service_id">com.doctoredapps.androidjeopardy</string>
+    <string name="team_name">Team Name</string>
+    <string name="join_as_player">Join as Player</string>
+    <string name="host_game">Host Game</string>
+    <string name="join_game">Join Game</string>
+    <string name="host_description">The host runs the game and ensures all players compete fairly.</string>
 </resources>

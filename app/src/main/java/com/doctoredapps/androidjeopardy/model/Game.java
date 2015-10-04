@@ -2,7 +2,6 @@ package com.doctoredapps.androidjeopardy.model;
 
 import android.database.Observable;
 import android.support.annotation.IntDef;
-import android.support.annotation.IntegerRes;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,28 +10,17 @@ import java.util.HashMap;
 /**
  * Created by MattDupree on 10/26/14.
  */
-public class Game implements Round.OnRoundEndedListener{
-
-    private final Round[] rounds;
-    private final HashMap<String, Player> players;
-
-    private Round currentRound;
-    private int currentRoundIndex;
-
-    private Player playerWithControl;
-
-    private GameStateObservable gameStateObservable;
-
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({GAME_STATE_NEW_ROUND, GAME_STATE_FINAL_JEOPARDY, GAME_STATE_END})
-    public @interface GAME_STATE{}
+public class Game implements Round.OnRoundEndedListener {
 
     public static final int GAME_STATE_NEW_ROUND = 0;
     public static final int GAME_STATE_FINAL_JEOPARDY = 1;
     public static final int GAME_STATE_END = 2;
-
-
+    private final Round[] rounds;
+    private final HashMap<String, Player> players;
+    private Round currentRound;
+    private int currentRoundIndex;
+    private Player playerWithControl;
+    private GameStateObservable gameStateObservable;
     Game(Round[] rounds, HashMap<String, Player> players) {
         this.rounds = rounds;
         this.players = players;
@@ -56,7 +44,6 @@ public class Game implements Round.OnRoundEndedListener{
         playerWithControl = player;
         player.setInControl(true);
     }
-
 
     @Override
     public void onRoundEnded() {
@@ -88,20 +75,25 @@ public class Game implements Round.OnRoundEndedListener{
         return currentRoundIndex == rounds.length;
     }
 
-    private static class GameStateObservable extends Observable<OnGameStateChangedListner>{
-        public void notifyGameStateChanged(@GAME_STATE int newGameState) {
-            for (OnGameStateChangedListner listner : mObservers) {
-                listner.onGameStateChanged(newGameState);
-            }
-        }
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({GAME_STATE_NEW_ROUND, GAME_STATE_FINAL_JEOPARDY, GAME_STATE_END})
+    public @interface GAME_STATE {
     }
 
     /**
      * Created by MattDupree on 10/26/14.
      */
-    public static interface OnGameStateChangedListner {
+    public interface OnGameStateChangedListner {
 
+        void onGameStateChanged(@GAME_STATE int newGameState);
 
-        public void onGameStateChanged(@GAME_STATE int newGameState);
+    }
+
+    private static class GameStateObservable extends Observable<OnGameStateChangedListner> {
+        public void notifyGameStateChanged(@GAME_STATE int newGameState) {
+            for (OnGameStateChangedListner listner : mObservers) {
+                listner.onGameStateChanged(newGameState);
+            }
+        }
     }
 }

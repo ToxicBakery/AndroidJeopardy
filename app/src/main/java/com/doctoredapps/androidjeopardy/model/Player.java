@@ -7,9 +7,9 @@ import android.database.Observable;
  */
 public class Player {
 
+    private final String id;
     private int score;
     private String finalJeopardyAnswer;
-    private final String id;
     private boolean isInControl;
 
     private PlayerControlObservable playerControlObservable;
@@ -53,8 +53,21 @@ public class Player {
     }
 
 
+    /**
+     * Created by MattDupree on 10/26/14.
+     */
+    public interface OnPlayerControlChanged {
+        void onPlayerControlChanged(String playerId);
+    }
 
-    private static class PlayerControlObservable extends Observable<OnPlayerControlChanged>{
+    /**
+     * Created by MattDupree on 10/26/14.
+     */
+    public interface OnPlayerScoreChangedListener {
+        void onPlayerScoreChanged(String playerId);
+    }
+
+    private static class PlayerControlObservable extends Observable<OnPlayerControlChanged> {
         private void notifyPlayerControlChanged(String playerId) {
             for (OnPlayerControlChanged listener : mObservers) {
                 listener.onPlayerControlChanged(playerId);
@@ -62,29 +75,12 @@ public class Player {
         }
     }
 
-    private static class PlayerScoreObservable extends Observable<OnPlayerScoreChangedListener>{
+    private static class PlayerScoreObservable extends Observable<OnPlayerScoreChangedListener> {
         private void notifyObserversScoreChanged(String playerId) {
             for (OnPlayerScoreChangedListener listener : mObservers) {
                 listener.onPlayerScoreChanged(playerId);
             }
         }
-    }
-
-
-
-    /**
-     * Created by MattDupree on 10/26/14.
-     */
-    public static interface OnPlayerControlChanged {
-        public void onPlayerControlChanged(String playerId);
-    }
-
-
-    /**
-     * Created by MattDupree on 10/26/14.
-     */
-    public static interface OnPlayerScoreChangedListener {
-        public void onPlayerScoreChanged(String playerId);
     }
 
 }
